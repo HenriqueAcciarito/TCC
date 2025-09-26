@@ -1,0 +1,95 @@
+import express from "express";
+import cors from "cors";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// --- Fundamentos de História ---
+const fundamentosHistoria = [
+  "Estudar a linha do tempo dos principais períodos (Antiguidade, Idade Média, Moderna e Contemporânea).",
+  "Revisar as principais revoluções (Francesa, Industrial, Russa, etc.).",
+  "Analisar causas e consequências das guerras (1ª e 2ª Guerras Mundiais, Guerra Fria).",
+  "Compreender a formação do Brasil: colonização, independência, República, Ditadura Militar e Nova República.",
+  "Praticar interpretação de fontes históricas (textos, imagens, documentos oficiais)."
+];
+
+// --- Questões de História (exemplo) ---
+const questoesHistoria = [
+  {
+    id: 1,
+    enunciado: "Qual foi a principal causa da Revolução Francesa?",
+    alternativas: [
+      "A crise financeira e social na França do século XVIII",
+      "A expansão marítima e comercial",
+      "A unificação da Itália",
+      "O fortalecimento do feudalismo"
+    ],
+    resposta: 0
+  },
+  {
+    id: 2,
+    enunciado: "Quem proclamou a Independência do Brasil em 1822?",
+    alternativas: [
+      "Dom João VI",
+      "Dom Pedro I",
+      "José Bonifácio",
+      "Tiradentes"
+    ],
+    resposta: 1
+  },
+  {
+    id: 3,
+    enunciado: "A Guerra Fria foi um conflito entre quais blocos?",
+    alternativas: [
+      "Estados Unidos e União Soviética",
+      "Alemanha e Inglaterra",
+      "França e Itália",
+      "China e Japão"
+    ],
+    resposta: 0
+  }
+];
+
+// --- Rotas ---
+app.get("/", (req, res) => {
+  res.send("API de Questões de História 📚");
+});
+
+// Lista de questões
+app.get("/api/historia/questoes", (req, res) => {
+  res.json(questoesHistoria);
+});
+
+// Fundamentos para resolver questões de História
+app.get("/api/historia/fundamentos", (req, res) => {
+  res.json(fundamentosHistoria);
+});
+
+// 🔹 Rota de correção
+app.post("/api/historia/responder", (req, res) => {
+  const { id, resposta } = req.body;
+
+  // procura a questão
+  const questao = questoesHistoria.find(q => q.id === id);
+  if (!questao) {
+    return res.status(404).json({ erro: "Questão não encontrada" });
+  }
+
+  // verifica resposta
+  const correta = questao.resposta === resposta;
+
+  res.json({
+    id: questao.id,
+    enunciado: questao.enunciado,
+    correta,
+    respostaCorreta: questao.alternativas[questao.resposta],
+    suaResposta: questao.alternativas[resposta] ?? "Opção inválida"
+  });
+});
+
+// --- Servidor ---
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
+});
